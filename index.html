@@ -349,10 +349,12 @@
     </div>
   </div>
   <div id="coffee-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center">
-    <div style="background:white;padding:20px;text-align:center;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
+    <div style="background:white;padding:24px 20px 20px;text-align:center;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.2);max-width:280px;width:90%">
       <button id="coffee-modal-close" style="position:absolute;top:8px;right:10px;border:none;background:none;font-size:16px;cursor:pointer;color:#999">&#x2715;</button>
-      <img src="qrcode.jpg" style="width:180px;height:180px;display:block;margin:0 auto">
-      <p style="font-size:11px;color:#999;margin-top:10px">&#25903;&#20184;&#23453;&#25195;&#30721; &middot; Alipay</p>
+      <p style="font-size:11px;color:#666;margin-bottom:12px;line-height:1.7">Grid It 完全免费 · 如果觉得有用，请扫码支持一下<br><span style="color:#aaa">Grid It is free · A coffee keeps it alive ☕</span></p>
+      <img src="qrcode.jpg" style="width:160px;height:160px;display:block;margin:0 auto">
+      <p style="font-size:10px;color:#aaa;margin-top:8px">支付宝 · Alipay</p>
+      <button id="coffee-skip-btn" style="margin-top:14px;width:100%;padding:7px;font-family:inherit;font-size:10px;letter-spacing:0.08em;cursor:pointer;border:1px solid #ddd;background:none;color:#aaa">skip · 直接下载</button>
     </div>
   </div>
 </aside>
@@ -705,19 +707,10 @@
     render();
   });
 
-  $('btn-download').addEventListener('click', () => {
-    const v = state;
-    const svgStr = buildSVG(v, 1, true);
-    const blob = new Blob([svgStr], {type:'image/svg+xml'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'gridit-' + v.pw.toFixed(0) + 'x' + v.ph.toFixed(0) + 'mm-' + v.cols + 'col.svg';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
+  $('btn-download').addEventListener('click', () => openCoffeeModal('svg'));
 
-  $('btn-download-png').addEventListener('click', () => {
+  $('btn-download-png').addEventListener('click', () => openCoffeeModal('png'));
+  $('btn-download-png').addEventListener('_do_png', () => {
     const v = state;
     const scale = 3;
     const svgStr = buildSVG(v, scale, true);
@@ -762,8 +755,8 @@
   });
 
   document.addEventListener('keydown', e => {
-    if ((e.key === 'o' || e.key === 'O') && !e.target.closest('aside') && document.activeElement !== selectedBlock) $('btn-download').click();
-    if (e.key === 'Escape') { closeModal(); closeAbout(); }
+    if ((e.key === 'o' || e.key === 'O') && !e.target.closest('aside') && document.activeElement !== selectedBlock) openCoffeeModal('svg');
+    if (e.key === 'Escape') { closeModal(); closeAbout(); closeCoffeeModal(false); }
   });
 
   // Help modal
@@ -780,10 +773,40 @@
   $('about-modal-close-btn').addEventListener('click', closeAbout);
   $('about-modal').addEventListener('click', e => { if (e.target === $('about-modal')) closeAbout(); });
 
-  // Coffee
-  $('btn-coffee').addEventListener('click', () => { $('coffee-modal').style.display = 'flex'; });
-  $('coffee-modal-close').addEventListener('click', () => { $('coffee-modal').style.display = 'none'; });
-  $('coffee-modal').addEventListener('click', e => { if (e.target === $('coffee-modal')) $('coffee-modal').style.display = 'none'; });
+  // Coffee modal + download paywall
+  let pendingDownload = null; // 'svg' | 'png' | null
+
+  function doActualDownload() {
+    if (pendingDownload === 'svg') {
+      const v = state;
+      const svgStr = buildSVG(v, 1, true);
+      const blob = new Blob([svgStr], {type:'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'gridit-' + v.pw.toFixed(0) + 'x' + v.ph.toFixed(0) + 'mm-' + v.cols + 'col.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (pendingDownload === 'png') {
+      $('btn-download-png').dispatchEvent(new CustomEvent('_do_png'));
+    }
+    pendingDownload = null;
+  }
+
+  function openCoffeeModal(type) {
+    pendingDownload = type;
+    $('coffee-modal').style.display = 'flex';
+  }
+  function closeCoffeeModal(andDownload) {
+    $('coffee-modal').style.display = 'none';
+    if (andDownload) doActualDownload();
+    else pendingDownload = null;
+  }
+
+  $('btn-coffee').addEventListener('click', () => { pendingDownload = null; $('coffee-modal').style.display = 'flex'; });
+  $('coffee-modal-close').addEventListener('click', () => closeCoffeeModal(true));
+  $('coffee-modal').addEventListener('click', e => { if (e.target === $('coffee-modal')) closeCoffeeModal(true); });
+  $('coffee-skip-btn').addEventListener('click', () => closeCoffeeModal(true));
 
   // ── Type layer ──────────────────────────────────────────────
 
