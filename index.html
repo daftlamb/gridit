@@ -124,6 +124,7 @@
   <span id="header-sub" style="font-size:11px;color:var(--muted)">v0.2 &mdash; graphic grid generator</span>
   <div class="header-actions">
     <button class="header-btn" id="btn-help">?</button>
+    <button class="header-btn" id="btn-about">i</button>
     <button class="header-btn lang-active" id="btn-lang-en">EN</button>
     <button class="header-btn" id="btn-lang-zh">&#20013;</button>
   </div>
@@ -146,6 +147,21 @@
     <h3 id="modal-h-shortcut">Shortcut</h3>
     <p id="modal-p-shortcut">Press <span class="modal-kbd">O</span> to instantly export the current grid as SVG.</p>
     <p style="margin-top:20px;font-size:10px;color:var(--border)">Made by mog &middot; daftlamb@gmail.com</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="about-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="about-modal-close-btn">&#x2715;</button>
+    <h2 id="about-modal-title">About Grid It</h2>
+    <h3 id="about-modal-h-what">What is Grid It?</h3>
+    <p id="about-modal-p-what">Grid It is a browser-based graphic grid generator for designers. Quickly set up classic typographic grids, export as SVG or PNG, and place them directly into your favourite design tools.</p>
+    <h3 id="about-modal-h-refs">Classic Grid References</h3>
+    <p id="about-modal-p-refs">Inspired by the foundational grid systems of <strong>Josef Müller-Brockmann</strong>, <strong>Jan Tschichold</strong>, and <strong>Van de Graaf</strong> — pioneers of modern typographic layout and the canon of page construction.</p>
+    <h3 id="about-modal-h-author">Author</h3>
+    <p id="about-modal-p-author">Made by <strong>mog</strong> &middot; <a href="mailto:daftlamb@gmail.com" style="color:var(--fg)">daftlamb@gmail.com</a></p>
+    <h3 id="about-modal-h-link">Website</h3>
+    <p id="about-modal-p-link"><a href="https://griditapp.com" target="_blank" style="color:var(--fg)">griditapp.com</a></p>
   </div>
 </div>
 
@@ -266,6 +282,17 @@
     <p class="section-title" data-i18n="type">Type</p>
     <div class="field">
       <label data-i18n="font-label">font</label>
+      <select id="font-select" style="width:100%;margin-bottom:6px;padding:4px 6px;border:1px solid var(--border);background:var(--bg);font-family:inherit;font-size:12px;color:var(--fg);outline:none;cursor:pointer">
+        <option value="">— select font —</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Outfit">Outfit</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Inter">Inter</option>
+        <option value="Space Mono">Space Mono</option>
+        <option value="Noto Sans SC">Noto Sans SC（思源黑）</option>
+        <option value="Noto Serif SC">Noto Serif SC（思源宋）</option>
+      </select>
       <div style="display:flex;gap:4px">
         <input type="text" id="font-input" placeholder="e.g. Inter" style="flex:1;padding:4px 6px;border:1px solid var(--border);background:var(--bg);font-family:inherit;font-size:12px;color:var(--fg);outline:none">
         <button id="btn-load-font" class="btn" style="width:auto;padding:4px 8px;white-space:nowrap" data-i18n="load">load</button>
@@ -283,10 +310,10 @@
   </div>
   <div class="divider"></div>
   <div class="btn-group">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-      <button class="btn" id="btn-download" data-i18n="download">&#8595; svg</button>
-      <button class="btn" id="btn-download-png" data-i18n="download-png">&#8595; png</button>
-      <button class="btn" id="btn-reset" data-i18n="reset">reset</button>
+    <button class="btn" id="btn-reset" data-i18n="reset">重置</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn" id="btn-download" data-i18n="download">↓ svg</button>
+      <button class="btn" id="btn-download-png" data-i18n="download-png">↓ png</button>
     </div>
   </div>
   <div class="divider"></div>
@@ -359,6 +386,15 @@
       'modal-p-shortcut':'Press <span class="modal-kbd">O</span> to instantly export the current grid as SVG.',
       'header-sub':'v0.2 \u2014 graphic grid generator',
       'opt-custom':'Custom', 'opt-none':'\u2014 none \u2014',
+      'about-modal-title':'About Grid It',
+      'about-modal-h-what':'What is Grid It?',
+      'about-modal-p-what':'Grid It is a browser-based graphic grid generator for designers. Quickly set up classic typographic grids, export as SVG or PNG, and place them directly into your favourite design tools.',
+      'about-modal-h-refs':'Classic Grid References',
+      'about-modal-p-refs':'Inspired by the foundational grid systems of <strong>Josef M\u00fcller-Brockmann</strong>, <strong>Jan Tschichold</strong>, and <strong>Van de Graaf</strong> \u2014 pioneers of modern typographic layout and the canon of page construction.',
+      'about-modal-h-author':'Author',
+      'about-modal-p-author':'Made by <strong>mog</strong> \u00b7 <a href="mailto:daftlamb@gmail.com" style="color:var(--fg)">daftlamb@gmail.com</a>',
+      'about-modal-h-link':'Website',
+      'about-modal-p-link':'<a href="https://griditapp.com" target="_blank" style="color:var(--fg)">griditapp.com</a>',
     },
     zh: {
       unit:'\u5355\u4f4d', paper:'\u7eb8\u5f20', preset:'\u9884\u8bbe\u5c3a\u5bf8', classic:'\u7ecf\u5178\u7f51\u683c',
@@ -382,6 +418,15 @@
       'modal-p-shortcut':'\u6309 <span class="modal-kbd">O</span> \u952e\u7acb\u5373\u5bfc\u51fa\u5f53\u524d\u7f51\u683c SVG\u3002',
       'header-sub':'v0.2 \u2014 \u7f51\u683c\u8bbe\u8ba1\u751f\u6210\u5668',
       'opt-custom':'\u81ea\u5b9a\u4e49', 'opt-none':'\u2014 \u65e0 \u2014',
+      'about-modal-title':'\u5173\u4e8e Grid It',
+      'about-modal-h-what':'Grid It \u662f\u4ec0\u4e48\uff1f',
+      'about-modal-p-what':'Grid It \u662f\u4e00\u4e2a\u57fa\u4e8e\u6d4f\u89c8\u5668\u7684\u56fe\u5f62\u7f51\u683c\u751f\u6210\u5de5\u5177\uff0c\u4e13\u4e3a\u8bbe\u8ba1\u5e08\u8bbe\u8ba1\u3002\u5feb\u901f\u5efa\u7acb\u7ecf\u5178\u6392\u7248\u7f51\u683c\uff0c\u5bfc\u51fa SVG \u6216 PNG\uff0c\u76f4\u63a5\u7f6e\u5165\u60a8\u559c\u6b22\u7684\u8bbe\u8ba1\u5de5\u5177\u3002',
+      'about-modal-h-refs':'\u7ecf\u5178\u7f51\u683c\u53c2\u8003',
+      'about-modal-p-refs':'\u7075\u611f\u6e90\u81ea <strong>Josef M\u00fcller-Brockmann</strong>\u3001<strong>Jan Tschichold</strong> \u548c <strong>Van de Graaf</strong> \u7684\u7ecf\u5178\u7f51\u683c\u4f53\u7cfb\u2014\u2014\u73b0\u4ee3\u6392\u7248\u8bbe\u8ba1\u4e0e\u9875\u9762\u6784\u6210\u6cd5\u5219\u7684\u5148\u9a71\u8005\u3002',
+      'about-modal-h-author':'\u4f5c\u8005',
+      'about-modal-p-author':'\u4f5c\u8005\uff1a<strong>mog</strong> \u00b7 <a href="mailto:daftlamb@gmail.com" style="color:var(--fg)">daftlamb@gmail.com</a>',
+      'about-modal-h-link':'\u7f51\u7ad9',
+      'about-modal-p-link':'<a href="https://griditapp.com" target="_blank" style="color:var(--fg)">griditapp.com</a>',
     },
   };
 
@@ -465,7 +510,10 @@
 
     const htmlIds = ['modal-title','modal-h-paper','modal-p-paper','modal-h-margins','modal-p-margins',
       'modal-h-cols','modal-p-cols','modal-h-colors','modal-p-colors',
-      'modal-h-export','modal-p-export','modal-h-shortcut','modal-p-shortcut','header-sub'];
+      'modal-h-export','modal-p-export','modal-h-shortcut','modal-p-shortcut','header-sub',
+      'about-modal-title','about-modal-h-what','about-modal-p-what',
+      'about-modal-h-refs','about-modal-p-refs','about-modal-h-author','about-modal-p-author',
+      'about-modal-h-link','about-modal-p-link'];
     htmlIds.forEach(id => { if (t[id] && $(id)) $(id).innerHTML = t[id]; });
 
     if (t['opt-custom'] && $('opt-custom')) $('opt-custom').textContent = t['opt-custom'];
@@ -687,7 +735,7 @@
 
   document.addEventListener('keydown', e => {
     if ((e.key === 'o' || e.key === 'O') && !e.target.closest('aside') && document.activeElement !== selectedBlock) $('btn-download').click();
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') { closeModal(); closeAbout(); }
   });
 
   // Help modal
@@ -696,6 +744,13 @@
   $('btn-help').addEventListener('click', openModal);
   $('modal-close-btn').addEventListener('click', closeModal);
   $('help-modal').addEventListener('click', e => { if (e.target === $('help-modal')) closeModal(); });
+
+  // About modal
+  function openAbout() { $('about-modal').classList.add('open'); }
+  function closeAbout() { $('about-modal').classList.remove('open'); }
+  $('btn-about').addEventListener('click', openAbout);
+  $('about-modal-close-btn').addEventListener('click', closeAbout);
+  $('about-modal').addEventListener('click', e => { if (e.target === $('about-modal')) closeAbout(); });
 
   // Coffee
   $('coffee-trigger').addEventListener('click', () => { $('coffee-modal').style.display = 'flex'; });
@@ -720,6 +775,14 @@
     document.querySelectorAll('.text-block').forEach(tb => {
       tb.style.lineHeight = currentLeading;
     });
+  });
+
+  // Font dropdown
+  $('font-select').addEventListener('change', () => {
+    const val = $('font-select').value;
+    if (!val) return;
+    $('font-input').value = val;
+    $('btn-load-font').click();
   });
 
   // Load Google Font
