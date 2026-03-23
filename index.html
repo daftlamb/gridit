@@ -230,31 +230,24 @@
     <p class="section-title" data-i18n="display">Display</p>
     <div class="toggle-row">
       <label data-i18n="col-label">columns</label>
-      <label class="toggle"><input type="checkbox" id="showcols" checked><span class="toggle-slider"></span></label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="color" id="color-cols" value="#6488dc" style="width:18px;height:18px;border:none;padding:0;background:none;cursor:pointer">
+        <label class="toggle"><input type="checkbox" id="showcols" checked><span class="toggle-slider"></span></label>
+      </div>
     </div>
     <div class="toggle-row">
       <label data-i18n="row-label">rows</label>
-      <label class="toggle"><input type="checkbox" id="showrows" checked><span class="toggle-slider"></span></label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="color" id="color-rows" value="#50b478" style="width:18px;height:18px;border:none;padding:0;background:none;cursor:pointer">
+        <label class="toggle"><input type="checkbox" id="showrows" checked><span class="toggle-slider"></span></label>
+      </div>
     </div>
     <div class="toggle-row">
       <label data-i18n="margins-label">margins</label>
-      <label class="toggle"><input type="checkbox" id="showmargins" checked><span class="toggle-slider"></span></label>
-    </div>
-  </div>
-  <div class="divider"></div>
-  <div>
-    <p class="section-title" data-i18n="colors">Colors</p>
-    <div class="color-row">
-      <label data-i18n="col-label">columns</label>
-      <input type="color" id="color-cols" value="#6488dc">
-    </div>
-    <div class="color-row">
-      <label data-i18n="row-label">rows</label>
-      <input type="color" id="color-rows" value="#50b478">
-    </div>
-    <div class="color-row">
-      <label data-i18n="margins-label">margins</label>
-      <input type="color" id="color-margins" value="#e8a0a0">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="color" id="color-margins" value="#e8a0a0" style="width:18px;height:18px;border:none;padding:0;background:none;cursor:pointer">
+        <label class="toggle"><input type="checkbox" id="showmargins" checked><span class="toggle-slider"></span></label>
+      </div>
     </div>
   </div>
   <div class="btn-group">
