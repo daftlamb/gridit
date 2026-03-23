@@ -726,17 +726,54 @@
   $('btn-load-font').addEventListener('click', () => {
     const fontName = $('font-input').value.trim();
     if (!fontName) return;
+    const btn = $('btn-load-font');
     const familyParam = fontName.replace(/\s+/g, '+');
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=' + familyParam + '&display=swap';
-    document.head.appendChild(link);
-    link.onload = () => {
-      currentFont = fontName;
-      document.querySelectorAll('.text-block').forEach(tb => {
-        tb.style.fontFamily = currentFont;
-      });
-    };
+    btn.textContent = '...';
+    btn.disabled = true;
+    // Try multiple CDN sources for China accessibility
+    const urls = [
+      'https://fonts.googleapis.com/css2?family=' + familyParam + '&display=swap',
+      'https://fonts.font.im/css2?family=' + familyParam + '&display=swap',
+    ];
+    let tried = 0;
+    function tryLoad(url) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      document.head.appendChild(link);
+      const timer = setTimeout(() => {
+        tried++;
+        if (tried < urls.length) tryLoad(urls[tried]);
+        else {
+          // Fallback: just set font name directly, browser may have it
+          currentFont = fontName;
+          document.querySelectorAll('.text-block').forEach(tb => tb.style.fontFamily = currentFont);
+          btn.textContent = currentLang === 'zh' ? '载入' : 'load';
+          btn.disabled = false;
+        }
+      }, 3000);
+      link.onload = () => {
+        clearTimeout(timer);
+        currentFont = fontName;
+        document.querySelectorAll('.text-block').forEach(tb => tb.style.fontFamily = currentFont);
+        const t = T[currentLang];
+        btn.textContent = t && t['load'] ? t['load'] : 'load';
+        btn.disabled = false;
+      };
+      link.onerror = () => {
+        clearTimeout(timer);
+        tried++;
+        if (tried < urls.length) tryLoad(urls[tried]);
+        else {
+          currentFont = fontName;
+          document.querySelectorAll('.text-block').forEach(tb => tb.style.fontFamily = currentFont);
+          const t = T[currentLang];
+          btn.textContent = t && t['load'] ? t['load'] : 'load';
+          btn.disabled = false;
+        }
+      };
+    }
+    tryLoad(urls[0]);
   });
 
   // Add text block
