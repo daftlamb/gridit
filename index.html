@@ -190,7 +190,7 @@
   <div>
     <p class="section-title">Paper</p>
     <div class="field">
-      <label>preset</label>
+      <label>paper</label>
       <select id="preset">
         <option value="a4">A4 (210 × 297mm)</option>
         <option value="a3">A3 (297 × 420mm)</option>
@@ -198,6 +198,25 @@
         <option value="letter">Letter (216 × 279mm)</option>
         <option value="square">Square (210 × 210mm)</option>
         <option value="custom">Custom</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>classic grid</label>
+      <select id="classic">
+        <option value="">— none —</option>
+        <optgroup label="Müller-Brockmann">
+          <option value="mbr_poster">Musica Viva Poster (4 col)</option>
+          <option value="mbr_book">Book Grid (6 col)</option>
+          <option value="mbr_magazine">Magazine (12 col)</option>
+        </optgroup>
+        <optgroup label="Tschichold / Van de Graaf">
+          <option value="tsch_canon">Canon of Page Construction</option>
+          <option value="tsch_book">New Typography Book</option>
+        </optgroup>
+        <optgroup label="Modern">
+          <option value="mod_960">960 Grid (12 col)</option>
+          <option value="mod_bootstrap">Bootstrap Grid (12 col)</option>
+        </optgroup>
       </select>
     </div>
     <div class="input-row">
@@ -312,10 +331,21 @@
     square: [210, 210],
   };
 
+  // Classic grid presets: { pw, ph, mt, mb, ml, mr, cols, gutter, rows, rgutter }
+  const classicPresets = {
+    mbr_poster:   { pw:594, ph:841, mt:40, mb:40, ml:40, mr:40, cols:4, gutter:6, rows:6, rgutter:6 },
+    mbr_book:     { pw:210, ph:297, mt:20, mb:25, ml:20, mr:15, cols:6, gutter:4, rows:9, rgutter:4 },
+    mbr_magazine: { pw:210, ph:297, mt:18, mb:22, ml:15, mr:15, cols:12, gutter:3, rows:12, rgutter:3 },
+    tsch_canon:   { pw:210, ph:297, mt:26, mb:37, ml:19, mr:26, cols:1, gutter:0, rows:1, rgutter:0 },
+    tsch_book:    { pw:210, ph:297, mt:22, mb:30, ml:18, mr:22, cols:3, gutter:5, rows:6, rgutter:5 },
+    mod_960:      { pw:257, ph:297, mt:20, mb:20, ml:13, mr:13, cols:12, gutter:10, rows:8, rgutter:5 },
+    mod_bootstrap:{ pw:210, ph:297, mt:20, mb:20, ml:15, mr:15, cols:12, gutter:6, rows:8, rgutter:5 },
+  };
+
   const $ = id => document.getElementById(id);
 
   const inputs = {
-    preset: $('preset'),
+    preset: $('preset'), classic: $('classic'),
     pw: $('pw'), ph: $('ph'),
     mt: $('mt'), mb: $('mb'), ml: $('ml'), mr: $('mr'),
     cols: $('cols'), gutter: $('gutter'),
@@ -327,6 +357,25 @@
   inputs.preset.addEventListener('change', () => {
     const p = presets[inputs.preset.value];
     if (p) { inputs.pw.value = p[0]; inputs.ph.value = p[1]; render(); }
+  });
+
+  // Classic preset change
+  inputs.classic.addEventListener('change', () => {
+    const key = inputs.classic.value;
+    if (!key) return;
+    const p = classicPresets[key];
+    inputs.pw.value = p.pw; inputs.ph.value = p.ph;
+    inputs.mt.value = p.mt; inputs.mb.value = p.mb;
+    inputs.ml.value = p.ml; inputs.mr.value = p.mr;
+    inputs.cols.value = p.cols; inputs.gutter.value = p.gutter;
+    inputs.rows.value = p.rows; inputs.rgutter.value = p.rgutter;
+    inputs.preset.value = 'custom';
+    // update range labels
+    $('cols-val').textContent = p.cols;
+    $('gutter-val').textContent = p.gutter;
+    $('rows-val').textContent = p.rows;
+    $('rgutter-val').textContent = p.rgutter;
+    render();
   });
 
   // Sync range labels
