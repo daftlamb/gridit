@@ -428,37 +428,45 @@
   function applyLang(lang) {
     currentLang = lang;
     const t = T[lang];
-    // section titles and labels with data-i18n
+
+    // 1. Elements with data-i18n that are plain text (no child elements)
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
       if (!t[key]) return;
-      // If element has child elements (e.g. color dot + input inside label), only update the text node
-      const hasChildren = el.children.length > 0;
-      if (hasChildren) {
-        // Find last text node and update it
-        for (let i = el.childNodes.length - 1; i >= 0; i--) {
-          if (el.childNodes[i].nodeType === 3) {
-            el.childNodes[i].textContent = ' ' + t[key];
-            break;
-          }
-        }
-      } else {
+      if (el.children.length === 0) {
         el.textContent = t[key];
       }
     });
-    // special elements
-    const ids = ['modal-title','modal-h-paper','modal-p-paper','modal-h-margins','modal-p-margins',
+
+    // 2. Display toggle labels that contain color dot + hidden input as children
+    //    — only update the trailing text node, preserve child elements
+    [['col-label','color-cols'],['row-label','color-rows'],['margins-label','color-margins']].forEach(([key, colorId]) => {
+      const label = document.querySelector('[data-i18n="' + key + '"]');
+      if (!label || !t[key]) return;
+      // Remove existing trailing text nodes, keep element children
+      Array.from(label.childNodes).forEach(node => {
+        if (node.nodeType === 3) node.remove();
+      });
+      label.appendChild(document.createTextNode(' ' + t[key]));
+    });
+
+    // 3. innerHTML elements (modals, about, header sub)
+    const htmlIds = ['modal-title','modal-h-paper','modal-p-paper','modal-h-margins','modal-p-margins',
       'modal-h-cols','modal-p-cols','modal-h-colors','modal-p-colors',
-      'modal-h-export','modal-p-export','modal-h-shortcut','modal-p-shortcut'];
-    ids.forEach(id => { if (t[id] && $(id)) $(id).innerHTML = t[id]; });
-    if (t['header-sub']) $('header-sub').innerHTML = t['header-sub'];
-    if (t['about-p1']) $('about-p1').textContent = t['about-p1'];
-    if (t['about-p3']) $('about-p3').innerHTML = t['about-p3'];
-    if (t['opt-custom']) $('opt-custom').textContent = t['opt-custom'];
-    if (t['opt-none']) $('opt-none').innerHTML = t['opt-none'];
-    // download btn
+      'modal-h-export','modal-p-export','modal-h-shortcut','modal-p-shortcut',
+      'header-sub','about-p3'];
+    htmlIds.forEach(id => { if (t[id] && $(id)) $(id).innerHTML = t[id]; });
+
+    // 4. Plain text elements by ID
+    if (t['about-p1'] && $('about-p1')) $('about-p1').textContent = t['about-p1'];
+    if (t['opt-custom'] && $('opt-custom')) $('opt-custom').textContent = t['opt-custom'];
+    if (t['opt-none'] && $('opt-none')) $('opt-none').textContent = t['opt-none'] === '&mdash; none &mdash;' ? '— none —' : t['opt-none'];
+
+    // 5. Buttons
     if (t['download']) $('btn-download').textContent = t['download'];
-    // lang btns
+    if (t['reset']) $('btn-reset').textContent = t['reset'];
+
+    // 6. Active state on lang buttons
     $('btn-lang-en').classList.toggle('lang-active', lang === 'en');
     $('btn-lang-zh').classList.toggle('lang-active', lang === 'zh');
   }
