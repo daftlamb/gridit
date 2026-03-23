@@ -431,7 +431,20 @@
     // section titles and labels with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      if (t[key]) el.textContent = t[key];
+      if (!t[key]) return;
+      // If element has child elements (e.g. color dot + input inside label), only update the text node
+      const hasChildren = el.children.length > 0;
+      if (hasChildren) {
+        // Find last text node and update it
+        for (let i = el.childNodes.length - 1; i >= 0; i--) {
+          if (el.childNodes[i].nodeType === 3) {
+            el.childNodes[i].textContent = ' ' + t[key];
+            break;
+          }
+        }
+      } else {
+        el.textContent = t[key];
+      }
     });
     // special elements
     const ids = ['modal-title','modal-h-paper','modal-p-paper','modal-h-margins','modal-p-margins',
