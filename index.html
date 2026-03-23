@@ -266,6 +266,7 @@
     </div>
   </div>
   <div class="btn-group">
+    <button class="btn" id="btn-reset" data-i18n="reset">reset</button>
     <button class="btn" id="btn-download" data-i18n="download">download svg</button>
   </div>
   <div class="divider"></div>
@@ -581,6 +582,25 @@
     const colWDisp = mmToDisplay(colWmm).toFixed(1);
     $('info-bar').textContent = mmToDisplay(v.pw).toFixed(1) + 'x' + mmToDisplay(v.ph).toFixed(1) + currentUnit + ' · ' + v.cols + ' cols · col ' + colWDisp + currentUnit;
   }
+
+  $('btn-reset').addEventListener('click', () => {
+    state = { pw:210, ph:297, mt:20, mb:20, ml:20, mr:20, cols:6, gutter:5, rows:8, rgutter:5, showcols:1, showrows:1, showmargins:1 };
+    $('color-cols').value = '#6488dc';
+    $('color-rows').value = '#50b478';
+    $('color-margins').value = '#e8a0a0';
+    ['color-cols','color-rows','color-margins'].forEach(id => {
+      const dot = $(id).previousElementSibling;
+      if (dot && dot.classList.contains('color-dot')) dot.style.background = $(id).value;
+    });
+    $('preset').value = 'a4';
+    $('classic').value = '';
+    currentUnit = 'mm';
+    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-unit="mm"]').classList.add('active');
+    updateUnitLabels();
+    stateToInputs();
+    render();
+  });
 
   $('btn-download').addEventListener('click', () => {
     const v = state;
