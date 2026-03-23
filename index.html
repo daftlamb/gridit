@@ -267,16 +267,23 @@
   </div>
   <div class="btn-group">
     <button class="btn" id="btn-reset" data-i18n="reset">reset</button>
-    <button class="btn" id="btn-download" data-i18n="download">download svg</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn" id="btn-download" data-i18n="download">svg</button>
+      <button class="btn" id="btn-download-png" data-i18n="download-png">png</button>
+    </div>
   </div>
   <div class="divider"></div>
-  <div style="position:relative" id="coffee-wrap">
+  <div id="coffee-wrap">
     <p class="section-title" data-i18n="support">Support | 请支持我</p>
     <p id="coffee-trigger" style="font-size:11px;color:#e07820;cursor:pointer;letter-spacing:0.03em">☕ buy me a coffee</p>
-    <span id="coffee-qr" style="display:none;position:absolute;bottom:28px;left:0;background:white;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:100">
-      <img src="qrcode.jpg" style="width:140px;height:140px;display:block">
-      <span style="display:block;text-align:center;font-size:9px;color:var(--muted);margin-top:4px">支付宝扫码</span>
-    </span>
+  </div>
+  <!-- Coffee QR modal -->
+  <div id="coffee-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center">
+    <div style="background:white;padding:20px;text-align:center;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
+      <button id="coffee-modal-close" style="position:absolute;top:8px;right:10px;border:none;background:none;font-size:16px;cursor:pointer;color:#999">✕</button>
+      <img src="qrcode.jpg" style="width:180px;height:180px;display:block;margin:0 auto">
+      <p style="font-size:11px;color:#999;margin-top:10px">支付宝扫码 · Alipay</p>
+    </div>
   </div>
   <div class="divider"></div>
   <div style="padding-bottom:8px">
@@ -321,7 +328,7 @@
       unit:'Unit', paper:'Paper', preset:'preset', classic:'classic grid',
       margins:'Margins', top:'top', bottom:'bottom', left:'left', right:'right',
       columns:'Columns', rows:'Rows', display:'Display', colors:'Colors',
-      download:'download svg', reset:'reset', support:'Support | \u8bf7\u652f\u6301\u6211', about:'About',
+      download:'svg', 'download-png':'png', reset:'reset', support:'Support | \u8bf7\u652f\u6301\u6211', about:'About',
       'col-label':'columns', 'row-label':'rows', 'margins-label':'margins',
       'modal-title':'How to use Grid It',
       'modal-h-paper':'Paper',
@@ -345,7 +352,7 @@
       unit:'\u5355\u4f4d', paper:'\u7eb8\u5f20', preset:'\u9884\u8bbe\u5c3a\u5bf8', classic:'\u7ecf\u5178\u7f51\u683c',
       margins:'\u9875\u8fb9\u8ddd', top:'\u4e0a', bottom:'\u4e0b', left:'\u5de6', right:'\u53f3',
       columns:'\u5217', rows:'\u884c', display:'\u663e\u793a', colors:'\u989c\u8272',
-      download:'\u4e0b\u8f7d SVG', reset:'\u91cd\u7f6e', support:'Support | \u8bf7\u652f\u6301\u6211', about:'\u5173\u4e8e',
+      download:'SVG', 'download-png':'PNG', reset:'\u91cd\u7f6e', support:'Support | \u8bf7\u652f\u6301\u6211', about:'\u5173\u4e8e',
       'col-label':'\u5217\u53c2\u8003\u7ebf', 'row-label':'\u884c\u53c2\u8003\u7ebf', 'margins-label':'\u9875\u8fb9\u8ddd',
       'modal-title':'\u4f7f\u7528\u8bf4\u660e / How to use',
       'modal-h-paper':'\u7eb8\u5f20\u8bbe\u7f6e Paper',
@@ -465,6 +472,7 @@
     // 5. Buttons
     if (t['download']) $('btn-download').textContent = t['download'];
     if (t['reset']) $('btn-reset').textContent = t['reset'];
+    if (t['download-png']) $('btn-download-png').textContent = t['download-png'];
 
     // 6. Active state on lang buttons
     $('btn-lang-en').classList.toggle('lang-active', lang === 'en');
@@ -635,6 +643,29 @@
     URL.revokeObjectURL(url);
   });
 
+  $('btn-download-png').addEventListener('click', () => {
+    const v = state;
+    const scale = 3; // 3x for high-res PNG
+    const svgStr = buildSVG(v, scale, true);
+    const W = v.pw * 3.7795275591 * scale;
+    const H = v.ph * 3.7795275591 * scale;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    const blob = new Blob([svgStr], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.download = 'gridit-' + v.pw.toFixed(0) + 'x' + v.ph.toFixed(0) + 'mm-' + v.cols + 'col.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = url;
+  });
+
   document.addEventListener('keydown', e => {
     if (e.key === 'o' || e.key === 'O') $('btn-download').click();
     if (e.key === 'Escape') closeModal();
@@ -647,11 +678,16 @@
   $('modal-close-btn').addEventListener('click', closeModal);
   $('help-modal').addEventListener('click', e => { if (e.target === $('help-modal')) closeModal(); });
 
-  // Coffee QR hover
-  const trigger = $('coffee-trigger');
-  const qr = $('coffee-qr');
-  trigger.addEventListener('mouseenter', () => qr.style.display = 'block');
-  $('coffee-wrap').addEventListener('mouseleave', () => qr.style.display = 'none');
+  // Coffee QR — click modal (works on mobile too)
+  $('coffee-trigger').addEventListener('click', () => {
+    $('coffee-modal').style.display = 'flex';
+  });
+  $('coffee-modal-close').addEventListener('click', () => {
+    $('coffee-modal').style.display = 'none';
+  });
+  $('coffee-modal').addEventListener('click', e => {
+    if (e.target === $('coffee-modal')) $('coffee-modal').style.display = 'none';
+  });
 
   stateToInputs();
   render();
