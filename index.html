@@ -125,6 +125,7 @@
   <div class="header-actions">
     <button class="header-btn" id="btn-help">?</button>
     <button class="header-btn" id="btn-about">i</button>
+    <button class="header-btn" id="btn-coffee" style="color:#e07820;border-color:#e07820">☕</button>
     <button class="header-btn lang-active" id="btn-lang-en">EN</button>
     <button class="header-btn" id="btn-lang-zh">&#20013;</button>
   </div>
@@ -345,10 +346,6 @@
       <button class="btn" id="btn-download" data-i18n="download">↓ svg</button>
       <button class="btn" id="btn-download-png" data-i18n="download-png">↓ png</button>
     </div>
-  </div>
-  <div class="divider"></div>
-  <div id="coffee-wrap">
-    <p id="coffee-trigger" style="font-size:11px;color:#e07820;cursor:pointer;letter-spacing:0.03em">&#9749; buy me a coffee</p>
   </div>
   <div id="coffee-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center">
     <div style="background:white;padding:20px;text-align:center;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
@@ -783,7 +780,7 @@
   $('about-modal').addEventListener('click', e => { if (e.target === $('about-modal')) closeAbout(); });
 
   // Coffee
-  $('coffee-trigger').addEventListener('click', () => { $('coffee-modal').style.display = 'flex'; });
+  $('btn-coffee').addEventListener('click', () => { $('coffee-modal').style.display = 'flex'; });
   $('coffee-modal-close').addEventListener('click', () => { $('coffee-modal').style.display = 'none'; });
   $('coffee-modal').addEventListener('click', e => { if (e.target === $('coffee-modal')) $('coffee-modal').style.display = 'none'; });
 
