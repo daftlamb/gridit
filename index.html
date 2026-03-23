@@ -366,7 +366,7 @@
     };
   }
 
-  function buildSVG(v, scale = 1) {
+  function buildSVG(v, scale = 1, forExport = false) {
     const W = v.pw * MM_TO_PX * scale;
     const H = v.ph * MM_TO_PX * scale;
     const s = MM_TO_PX * scale;
@@ -392,7 +392,9 @@
     if (v.showcols) {
       for (let i = 0; i < v.cols; i++) {
         const x = ml + i * (colW + v.gutter * s);
-        svg += `<rect x="${x}" y="${mt}" width="${colW}" height="${contentH}" fill="rgba(100,140,220,0.08)" stroke="rgba(100,140,220,0.4)" stroke-width="${0.5 * scale}"/>`;
+        const colFill = forExport ? "none" : "rgba(100,140,220,0.08)";
+        const colStroke = forExport ? "rgba(100,140,220,0.7)" : "rgba(100,140,220,0.4)";
+        svg += `<rect x="${x}" y="${mt}" width="${colW}" height="${contentH}" fill="${colFill}" stroke="${colStroke}" stroke-width="${0.5 * scale}"/>`;
       }
     }
 
@@ -400,7 +402,9 @@
     if (v.showrows) {
       for (let i = 0; i < v.rows; i++) {
         const y = mt + i * (rowH + v.rgutter * s);
-        svg += `<rect x="${ml}" y="${y}" width="${contentW}" height="${rowH}" fill="rgba(80,180,120,0.05)" stroke="rgba(80,180,120,0.35)" stroke-width="${0.5 * scale}"/>`;
+        const rowFill = forExport ? "none" : "rgba(80,180,120,0.05)";
+        const rowStroke = forExport ? "rgba(80,180,120,0.7)" : "rgba(80,180,120,0.35)";
+        svg += `<rect x="${ml}" y="${y}" width="${contentW}" height="${rowH}" fill="${rowFill}" stroke="${rowStroke}" stroke-width="${0.5 * scale}"/>`;
       }
     }
 
@@ -435,7 +439,7 @@
   // Download
   $('btn-download').addEventListener('click', () => {
     const v = getValues();
-    const svgStr = buildSVG(v, 1);
+    const svgStr = buildSVG(v, 1, true);
     const blob = new Blob([svgStr], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
