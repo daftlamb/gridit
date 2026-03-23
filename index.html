@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid It</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4f0;
+      --fg: #1a1a1a;
+      --accent: #1a1a1a;
+      --muted: #999;
+      --border: #d0cfc9;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--fg);
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    header h1 { font-size: 14px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
+    header span { font-size: 11px; color: var(--muted); }
+
+    /* SIDEBAR */
+    aside {
+      border-right: 1px solid var(--border);
+      padding: 20px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .field label span { color: var(--fg); font-weight: bold; }
+
+    input[type="range"] {
+      width: 100%;
+      height: 2px;
+      appearance: none;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 8px;
+      height: 14px;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .num-input {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .num-input label { font-size: 10px; color: var(--muted); }
+
+    .num-input input[type="number"] {
+      width: 100%;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--fg);
+      outline: none;
+    }
+
+    .num-input input[type="number"]:focus { border-color: var(--accent); }
+
+    select {
+      width: 100%;
+      padding: 4px 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--fg);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .divider { height: 1px; background: var(--border); }
+
+    .btn {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--accent);
+      background: transparent;
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--fg);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn:hover { background: var(--accent); color: var(--bg); }
+
+    .btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+
+    /* CANVAS */
+    main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8e7e3;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #preview-wrap {
+      position: relative;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    }
+
+    #grid-svg {
+      display: block;
+    }
+
+    .info-bar {
+      position: absolute;
+      bottom: 16px;
+      right: 20px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Grid It</h1>
+  <span>v0.1 — graphic grid generator</span>
+</header>
+
+<aside>
+
+  <!-- Paper -->
+  <div>
+    <p class="section-title">Paper</p>
+    <div class="field">
+      <label>preset</label>
+      <select id="preset">
+        <option value="a4">A4 (210 × 297mm)</option>
+        <option value="a3">A3 (297 × 420mm)</option>
+        <option value="a5">A5 (148 × 210mm)</option>
+        <option value="letter">Letter (216 × 279mm)</option>
+        <option value="square">Square (210 × 210mm)</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+    <div class="input-row">
+      <div class="num-input">
+        <label>width (mm)</label>
+        <input type="number" id="pw" value="210" min="10" max="2000">
+      </div>
+      <div class="num-input">
+        <label>height (mm)</label>
+        <input type="number" id="ph" value="297" min="10" max="2000">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Margins -->
+  <div>
+    <p class="section-title">Margins</p>
+    <div class="input-row">
+      <div class="num-input">
+        <label>top</label>
+        <input type="number" id="mt" value="20" min="0" max="200">
+      </div>
+      <div class="num-input">
+        <label>bottom</label>
+        <input type="number" id="mb" value="20" min="0" max="200">
+      </div>
+    </div>
+    <div class="input-row" style="margin-top:8px">
+      <div class="num-input">
+        <label>left</label>
+        <input type="number" id="ml" value="20" min="0" max="200">
+      </div>
+      <div class="num-input">
+        <label>right</label>
+        <input type="number" id="mr" value="20" min="0" max="200">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Columns -->
+  <div>
+    <p class="section-title">Columns</p>
+    <div class="field">
+      <label>count <span id="cols-val">6</span></label>
+      <input type="range" id="cols" min="1" max="24" value="6">
+    </div>
+    <div class="field">
+      <label>gutter (mm) <span id="gutter-val">5</span></label>
+      <input type="range" id="gutter" min="0" max="30" step="0.5" value="5">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Rows / Baseline -->
+  <div>
+    <p class="section-title">Rows</p>
+    <div class="field">
+      <label>count <span id="rows-val">8</span></label>
+      <input type="range" id="rows" min="1" max="40" value="8">
+    </div>
+    <div class="field">
+      <label>row gutter (mm) <span id="rgutter-val">5</span></label>
+      <input type="range" id="rgutter" min="0" max="20" step="0.5" value="5">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Display -->
+  <div>
+    <p class="section-title">Display</p>
+    <div class="field">
+      <label>show columns <span id="showcols-val">on</span></label>
+      <input type="range" id="showcols" min="0" max="1" step="1" value="1">
+    </div>
+    <div class="field">
+      <label>show rows <span id="showrows-val">on</span></label>
+      <input type="range" id="showrows" min="0" max="1" step="1" value="1">
+    </div>
+    <div class="field">
+      <label>show margins <span id="showmargins-val">on</span></label>
+      <input type="range" id="showmargins" min="0" max="1" step="1" value="1">
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn" id="btn-download">download svg</button>
+  </div>
+
+</aside>
+
+<main>
+  <div id="preview-wrap">
+    <svg id="grid-svg"></svg>
+  </div>
+  <div class="info-bar" id="info-bar"></div>
+</main>
+
+<script>
+  const MM_TO_PX = 3.7795275591; // 1mm = this many px at 96dpi
+
+  const presets = {
+    a4:     [210, 297],
+    a3:     [297, 420],
+    a5:     [148, 210],
+    letter: [216, 279],
+    square: [210, 210],
+  };
+
+  const $ = id => document.getElementById(id);
+
+  const inputs = {
+    preset: $('preset'),
+    pw: $('pw'), ph: $('ph'),
+    mt: $('mt'), mb: $('mb'), ml: $('ml'), mr: $('mr'),
+    cols: $('cols'), gutter: $('gutter'),
+    rows: $('rows'), rgutter: $('rgutter'),
+    showcols: $('showcols'), showrows: $('showrows'), showmargins: $('showmargins'),
+  };
+
+  // Preset change
+  inputs.preset.addEventListener('change', () => {
+    const p = presets[inputs.preset.value];
+    if (p) { inputs.pw.value = p[0]; inputs.ph.value = p[1]; render(); }
+  });
+
+  // Sync range labels
+  const rangeLabels = {
+    cols: 'cols-val', gutter: 'gutter-val',
+    rows: 'rows-val', rgutter: 'rgutter-val',
+    showcols: 'showcols-val', showrows: 'showrows-val', showmargins: 'showmargins-val',
+  };
+
+  Object.entries(rangeLabels).forEach(([id, labelId]) => {
+    const el = $(id);
+    const label = $(labelId);
+    el.addEventListener('input', () => {
+      if (id === 'showcols') label.textContent = el.value == 1 ? 'on' : 'off';
+      else if (id === 'showrows') label.textContent = el.value == 1 ? 'on' : 'off';
+      else if (id === 'showmargins') label.textContent = el.value == 1 ? 'on' : 'off';
+      else label.textContent = el.value;
+      render();
+    });
+  });
+
+  // Number inputs
+  ['pw','ph','mt','mb','ml','mr'].forEach(id => {
+    $(id).addEventListener('input', () => { inputs.preset.value = 'custom'; render(); });
+  });
+
+  function getValues() {
+    return {
+      pw: +inputs.pw.value, ph: +inputs.ph.value,
+      mt: +inputs.mt.value, mb: +inputs.mb.value,
+      ml: +inputs.ml.value, mr: +inputs.mr.value,
+      cols: +inputs.cols.value, gutter: +inputs.gutter.value,
+      rows: +inputs.rows.value, rgutter: +inputs.rgutter.value,
+      showcols: +inputs.showcols.value,
+      showrows: +inputs.showrows.value,
+      showmargins: +inputs.showmargins.value,
+    };
+  }
+
+  function buildSVG(v, scale = 1) {
+    const W = v.pw * MM_TO_PX * scale;
+    const H = v.ph * MM_TO_PX * scale;
+    const s = MM_TO_PX * scale;
+
+    const mt = v.mt * s, mb = v.mb * s, ml = v.ml * s, mr = v.mr * s;
+    const contentW = W - ml - mr;
+    const contentH = H - mt - mb;
+
+    const colW = (contentW - (v.cols - 1) * v.gutter * s) / v.cols;
+    const rowH = (contentH - (v.rows - 1) * v.rgutter * s) / v.rows;
+
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+
+    // White background
+    svg += `<rect width="${W}" height="${H}" fill="white"/>`;
+
+    // Margin box
+    if (v.showmargins) {
+      svg += `<rect x="${ml}" y="${mt}" width="${contentW}" height="${contentH}" fill="none" stroke="#e8a0a0" stroke-width="${0.5 * scale}" stroke-dasharray="${3*scale},${3*scale}"/>`;
+    }
+
+    // Columns
+    if (v.showcols) {
+      for (let i = 0; i < v.cols; i++) {
+        const x = ml + i * (colW + v.gutter * s);
+        svg += `<rect x="${x}" y="${mt}" width="${colW}" height="${contentH}" fill="rgba(100,140,220,0.08)" stroke="rgba(100,140,220,0.4)" stroke-width="${0.5 * scale}"/>`;
+      }
+    }
+
+    // Rows
+    if (v.showrows) {
+      for (let i = 0; i < v.rows; i++) {
+        const y = mt + i * (rowH + v.rgutter * s);
+        svg += `<rect x="${ml}" y="${y}" width="${contentW}" height="${rowH}" fill="rgba(80,180,120,0.05)" stroke="rgba(80,180,120,0.35)" stroke-width="${0.5 * scale}"/>`;
+      }
+    }
+
+    svg += `</svg>`;
+    return svg;
+  }
+
+  function render() {
+    const v = getValues();
+    const main = document.querySelector('main');
+    const maxW = main.clientWidth - 80;
+    const maxH = main.clientHeight - 80;
+    const scaleW = maxW / (v.pw * MM_TO_PX);
+    const scaleH = maxH / (v.ph * MM_TO_PX);
+    const scale = Math.min(scaleW, scaleH, 1);
+
+    const W = v.pw * MM_TO_PX * scale;
+    const H = v.ph * MM_TO_PX * scale;
+
+    const svgEl = $('grid-svg');
+    svgEl.style.width = W + 'px';
+    svgEl.style.height = H + 'px';
+    svgEl.innerHTML = buildSVG(v, scale).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+    svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svgEl.setAttribute('width', W);
+    svgEl.setAttribute('height', H);
+
+    const colW = ((v.pw - v.ml - v.mr) - (v.cols - 1) * v.gutter) / v.cols;
+    $('info-bar').textContent = `${v.pw}×${v.ph}mm · ${v.cols} cols · col width ${colW.toFixed(1)}mm`;
+  }
+
+  // Download
+  $('btn-download').addEventListener('click', () => {
+    const v = getValues();
+    const svgStr = buildSVG(v, 1);
+    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gridit-${v.pw}x${v.ph}-${v.cols}col.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'o') $('btn-download').click();
+  });
+
+  // Init
+  render();
+  window.addEventListener('resize', render);
+</script>
+
+</body>
+</html>
