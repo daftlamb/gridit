@@ -6,174 +6,96 @@
   <title>Grid It</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f5f4f0;
-      --fg: #1a1a1a;
-      --accent: #1a1a1a;
-      --muted: #999;
-      --border: #d0cfc9;
+      --bg: #f5f4f0; --fg: #1a1a1a; --accent: #1a1a1a;
+      --muted: #999; --border: #d0cfc9;
     }
-
     body {
       font-family: 'Courier New', monospace;
-      background: var(--bg);
-      color: var(--fg);
+      background: var(--bg); color: var(--fg);
       height: 100vh;
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 290px 1fr;
       grid-template-rows: auto 1fr;
       overflow: hidden;
     }
-
     header {
       grid-column: 1 / -1;
-      padding: 16px 24px;
+      padding: 14px 24px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
+      display: flex; align-items: baseline; gap: 16px;
     }
-
     header h1 { font-size: 14px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
     header span { font-size: 11px; color: var(--muted); }
-
-    /* SIDEBAR */
     aside {
       border-right: 1px solid var(--border);
-      padding: 20px 20px;
+      padding: 16px 18px;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      display: flex; flex-direction: column; gap: 16px;
     }
-
     .section-title {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
+      font-size: 10px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
     }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .field label {
-      font-size: 11px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-    }
-
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+    .field label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
     .field label span { color: var(--fg); font-weight: bold; }
-
     input[type="range"] {
-      width: 100%;
-      height: 2px;
-      appearance: none;
-      background: var(--border);
-      outline: none;
-      cursor: pointer;
+      width: 100%; height: 2px; appearance: none;
+      background: var(--border); outline: none; cursor: pointer;
     }
-
     input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
-      width: 8px;
-      height: 14px;
-      background: var(--accent);
-      cursor: pointer;
+      appearance: none; width: 8px; height: 14px;
+      background: var(--accent); cursor: pointer;
     }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .num-input {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .num-input { display: flex; flex-direction: column; gap: 3px; }
     .num-input label { font-size: 10px; color: var(--muted); }
-
     .num-input input[type="number"] {
-      width: 100%;
-      padding: 4px 6px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      font-family: inherit;
-      font-size: 12px;
-      color: var(--fg);
-      outline: none;
+      width: 100%; padding: 4px 6px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-family: inherit; font-size: 12px; color: var(--fg); outline: none;
     }
-
     .num-input input[type="number"]:focus { border-color: var(--accent); }
-
     select {
-      width: 100%;
-      padding: 4px 6px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      font-family: inherit;
-      font-size: 12px;
-      color: var(--fg);
-      outline: none;
-      cursor: pointer;
+      width: 100%; padding: 4px 6px;
+      border: 1px solid var(--border); background: var(--bg);
+      font-family: inherit; font-size: 12px; color: var(--fg);
+      outline: none; cursor: pointer;
     }
-
     .divider { height: 1px; background: var(--border); }
-
     .btn {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--accent);
-      background: transparent;
-      font-family: inherit;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: var(--fg);
+      width: 100%; padding: 8px;
+      border: 1px solid var(--accent); background: transparent;
+      font-family: inherit; font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; color: var(--fg);
       transition: background 0.15s, color 0.15s;
     }
-
     .btn:hover { background: var(--accent); color: var(--bg); }
-
-    .btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
-
-    /* CANVAS */
+    .btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 8px; }
+    .unit-toggle {
+      display: flex; gap: 4px;
+    }
+    .unit-btn {
+      flex: 1; padding: 4px;
+      border: 1px solid var(--border); background: transparent;
+      font-family: inherit; font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .unit-btn.active {
+      border-color: var(--accent); color: var(--fg); font-weight: bold;
+    }
     main {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e8e7e3;
-      overflow: hidden;
-      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      background: #e8e7e3; overflow: hidden; position: relative;
     }
-
-    #preview-wrap {
-      position: relative;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
-    }
-
-    #grid-svg {
-      display: block;
-    }
-
+    #preview-wrap { position: relative; box-shadow: 0 4px 32px rgba(0,0,0,0.12); }
+    #grid-svg { display: block; }
     .info-bar {
-      position: absolute;
-      bottom: 16px;
-      right: 20px;
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
+      position: absolute; bottom: 16px; right: 20px;
+      font-size: 10px; color: var(--muted); letter-spacing: 0.05em;
     }
   </style>
 </head>
@@ -181,22 +103,33 @@
 
 <header>
   <h1>Grid It</h1>
-  <span>v0.1 — graphic grid generator</span>
+  <span>v0.2 — graphic grid generator</span>
 </header>
 
 <aside>
+  <!-- Unit -->
+  <div>
+    <p class="section-title">Unit</p>
+    <div class="unit-toggle">
+      <button class="unit-btn active" data-unit="mm">mm</button>
+      <button class="unit-btn" data-unit="px">px</button>
+      <button class="unit-btn" data-unit="pt">pt</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
 
   <!-- Paper -->
   <div>
     <p class="section-title">Paper</p>
     <div class="field">
-      <label>paper</label>
+      <label>preset</label>
       <select id="preset">
-        <option value="a4">A4 (210 × 297mm)</option>
-        <option value="a3">A3 (297 × 420mm)</option>
-        <option value="a5">A5 (148 × 210mm)</option>
-        <option value="letter">Letter (216 × 279mm)</option>
-        <option value="square">Square (210 × 210mm)</option>
+        <option value="a4">A4</option>
+        <option value="a3">A3</option>
+        <option value="a5">A5</option>
+        <option value="letter">Letter</option>
+        <option value="square">Square</option>
         <option value="custom">Custom</option>
       </select>
     </div>
@@ -221,12 +154,12 @@
     </div>
     <div class="input-row">
       <div class="num-input">
-        <label>width (mm)</label>
-        <input type="number" id="pw" value="210" min="10" max="2000">
+        <label id="lbl-pw">width (mm)</label>
+        <input type="number" id="pw" value="210" min="1" max="9999" step="0.1">
       </div>
       <div class="num-input">
-        <label>height (mm)</label>
-        <input type="number" id="ph" value="297" min="10" max="2000">
+        <label id="lbl-ph">height (mm)</label>
+        <input type="number" id="ph" value="297" min="1" max="9999" step="0.1">
       </div>
     </div>
   </div>
@@ -238,22 +171,22 @@
     <p class="section-title">Margins</p>
     <div class="input-row">
       <div class="num-input">
-        <label>top</label>
-        <input type="number" id="mt" value="20" min="0" max="200">
+        <label id="lbl-mt">top</label>
+        <input type="number" id="mt" value="20" min="0" max="999" step="0.1">
       </div>
       <div class="num-input">
-        <label>bottom</label>
-        <input type="number" id="mb" value="20" min="0" max="200">
+        <label id="lbl-mb">bottom</label>
+        <input type="number" id="mb" value="20" min="0" max="999" step="0.1">
       </div>
     </div>
     <div class="input-row" style="margin-top:8px">
       <div class="num-input">
-        <label>left</label>
-        <input type="number" id="ml" value="20" min="0" max="200">
+        <label id="lbl-ml">left</label>
+        <input type="number" id="ml" value="20" min="0" max="999" step="0.1">
       </div>
       <div class="num-input">
-        <label>right</label>
-        <input type="number" id="mr" value="20" min="0" max="200">
+        <label id="lbl-mr">right</label>
+        <input type="number" id="mr" value="20" min="0" max="999" step="0.1">
       </div>
     </div>
   </div>
@@ -268,14 +201,14 @@
       <input type="range" id="cols" min="1" max="24" value="6">
     </div>
     <div class="field">
-      <label>gutter (mm) <span id="gutter-val">5</span></label>
+      <label>gutter <span id="gutter-val">5</span> <span id="gutter-unit" style="font-weight:normal;color:var(--muted)">mm</span></label>
       <input type="range" id="gutter" min="0" max="30" step="0.5" value="5">
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- Rows / Baseline -->
+  <!-- Rows -->
   <div>
     <p class="section-title">Rows</p>
     <div class="field">
@@ -283,7 +216,7 @@
       <input type="range" id="rows" min="1" max="40" value="8">
     </div>
     <div class="field">
-      <label>row gutter (mm) <span id="rgutter-val">5</span></label>
+      <label>gutter <span id="rgutter-val">5</span> <span id="rgutter-unit" style="font-weight:normal;color:var(--muted)">mm</span></label>
       <input type="range" id="rgutter" min="0" max="20" step="0.5" value="5">
     </div>
   </div>
@@ -294,15 +227,15 @@
   <div>
     <p class="section-title">Display</p>
     <div class="field">
-      <label>show columns <span id="showcols-val">on</span></label>
+      <label>columns <span id="showcols-val">on</span></label>
       <input type="range" id="showcols" min="0" max="1" step="1" value="1">
     </div>
     <div class="field">
-      <label>show rows <span id="showrows-val">on</span></label>
+      <label>rows <span id="showrows-val">on</span></label>
       <input type="range" id="showrows" min="0" max="1" step="1" value="1">
     </div>
     <div class="field">
-      <label>show margins <span id="showmargins-val">on</span></label>
+      <label>margins <span id="showmargins-val">on</span></label>
       <input type="range" id="showmargins" min="0" max="1" step="1" value="1">
     </div>
   </div>
@@ -310,7 +243,6 @@
   <div class="btn-group">
     <button class="btn" id="btn-download">download svg</button>
   </div>
-
 </aside>
 
 <main>
@@ -321,157 +253,198 @@
 </main>
 
 <script>
-  const MM_TO_PX = 3.7795275591; // 1mm = this many px at 96dpi
+  const MM_TO_PX_96 = 3.7795275591;
 
-  const presets = {
-    a4:     [210, 297],
-    a3:     [297, 420],
-    a5:     [148, 210],
-    letter: [216, 279],
-    square: [210, 210],
+  // Unit conversion — internal unit is always mm
+  const unitFactors = { mm: 1, px: 1/MM_TO_PX_96, pt: 0.352778 };
+  // to convert from mm to display unit: mm / unitFactors[unit]
+  // to convert from display unit to mm: val * unitFactors[unit]
+
+  let currentUnit = 'mm';
+
+  // Paper presets in mm
+  const paperPresets = {
+    a4:     [210, 297], a3: [297, 420], a5: [148, 210],
+    letter: [216, 279], square: [210, 210],
   };
 
-  // Classic grid presets: { pw, ph, mt, mb, ml, mr, cols, gutter, rows, rgutter }
+  // Classic presets in mm
   const classicPresets = {
-    mbr_poster:   { pw:594, ph:841, mt:40, mb:40, ml:40, mr:40, cols:4, gutter:6, rows:6, rgutter:6 },
-    mbr_book:     { pw:210, ph:297, mt:20, mb:25, ml:20, mr:15, cols:6, gutter:4, rows:9, rgutter:4 },
-    mbr_magazine: { pw:210, ph:297, mt:18, mb:22, ml:15, mr:15, cols:12, gutter:3, rows:12, rgutter:3 },
-    tsch_canon:   { pw:210, ph:297, mt:26, mb:37, ml:19, mr:26, cols:1, gutter:0, rows:1, rgutter:0 },
-    tsch_book:    { pw:210, ph:297, mt:22, mb:30, ml:18, mr:22, cols:3, gutter:5, rows:6, rgutter:5 },
-    mod_960:      { pw:257, ph:297, mt:20, mb:20, ml:13, mr:13, cols:12, gutter:10, rows:8, rgutter:5 },
-    mod_bootstrap:{ pw:210, ph:297, mt:20, mb:20, ml:15, mr:15, cols:12, gutter:6, rows:8, rgutter:5 },
+    mbr_poster:    { pw:594, ph:841, mt:40, mb:40, ml:40, mr:40, cols:4, gutter:6, rows:6, rgutter:6 },
+    mbr_book:      { pw:210, ph:297, mt:20, mb:25, ml:20, mr:15, cols:6, gutter:4, rows:9, rgutter:4 },
+    mbr_magazine:  { pw:210, ph:297, mt:18, mb:22, ml:15, mr:15, cols:12, gutter:3, rows:12, rgutter:3 },
+    tsch_canon:    { pw:210, ph:297, mt:26, mb:37, ml:19, mr:26, cols:1, gutter:0, rows:1, rgutter:0 },
+    tsch_book:     { pw:210, ph:297, mt:22, mb:30, ml:18, mr:22, cols:3, gutter:5, rows:6, rgutter:5 },
+    mod_960:       { pw:257, ph:297, mt:20, mb:20, ml:13, mr:13, cols:12, gutter:10, rows:8, rgutter:5 },
+    mod_bootstrap: { pw:210, ph:297, mt:20, mb:20, ml:15, mr:15, cols:12, gutter:6, rows:8, rgutter:5 },
   };
 
   const $ = id => document.getElementById(id);
 
-  const inputs = {
-    preset: $('preset'), classic: $('classic'),
-    pw: $('pw'), ph: $('ph'),
-    mt: $('mt'), mb: $('mb'), ml: $('ml'), mr: $('mr'),
-    cols: $('cols'), gutter: $('gutter'),
-    rows: $('rows'), rgutter: $('rgutter'),
-    showcols: $('showcols'), showrows: $('showrows'), showmargins: $('showmargins'),
+  // Internal state in mm
+  let state = {
+    pw:210, ph:297, mt:20, mb:20, ml:20, mr:20,
+    cols:6, gutter:5, rows:8, rgutter:5,
+    showcols:1, showrows:1, showmargins:1,
   };
 
-  // Preset change
-  inputs.preset.addEventListener('change', () => {
-    const p = presets[inputs.preset.value];
-    if (p) { inputs.pw.value = p[0]; inputs.ph.value = p[1]; render(); }
+  function mmToDisplay(v) {
+    return parseFloat((v / unitFactors[currentUnit]).toFixed(2));
+  }
+  function displayToMm(v) {
+    return v * unitFactors[currentUnit];
+  }
+
+  function updateUnitLabels() {
+    const u = currentUnit;
+    $('lbl-pw').textContent = `width (${u})`;
+    $('lbl-ph').textContent = `height (${u})`;
+    $('gutter-unit').textContent = u;
+    $('rgutter-unit').textContent = u;
+  }
+
+  function stateToInputs() {
+    $('pw').value = mmToDisplay(state.pw);
+    $('ph').value = mmToDisplay(state.ph);
+    $('mt').value = mmToDisplay(state.mt);
+    $('mb').value = mmToDisplay(state.mb);
+    $('ml').value = mmToDisplay(state.ml);
+    $('mr').value = mmToDisplay(state.mr);
+    $('cols').value = state.cols;
+    $('gutter').value = mmToDisplay(state.gutter);
+    $('rows').value = state.rows;
+    $('rgutter').value = mmToDisplay(state.rgutter);
+    $('cols-val').textContent = state.cols;
+    $('gutter-val').textContent = mmToDisplay(state.gutter);
+    $('rows-val').textContent = state.rows;
+    $('rgutter-val').textContent = mmToDisplay(state.rgutter);
+    $('showcols').value = state.showcols;
+    $('showrows').value = state.showrows;
+    $('showmargins').value = state.showmargins;
+    $('showcols-val').textContent = state.showcols ? 'on' : 'off';
+    $('showrows-val').textContent = state.showrows ? 'on' : 'off';
+    $('showmargins-val').textContent = state.showmargins ? 'on' : 'off';
+  }
+
+  function inputsToState() {
+    state.pw = displayToMm(+$('pw').value);
+    state.ph = displayToMm(+$('ph').value);
+    state.mt = displayToMm(+$('mt').value);
+    state.mb = displayToMm(+$('mb').value);
+    state.ml = displayToMm(+$('ml').value);
+    state.mr = displayToMm(+$('mr').value);
+    state.cols = +$('cols').value;
+    state.gutter = displayToMm(+$('gutter').value);
+    state.rows = +$('rows').value;
+    state.rgutter = displayToMm(+$('rgutter').value);
+    state.showcols = +$('showcols').value;
+    state.showrows = +$('showrows').value;
+    state.showmargins = +$('showmargins').value;
+  }
+
+  // Unit toggle
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      inputsToState();
+      currentUnit = btn.dataset.unit;
+      document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateUnitLabels();
+      stateToInputs();
+      render();
+    });
   });
 
-  // Classic preset change
-  inputs.classic.addEventListener('change', () => {
-    const key = inputs.classic.value;
+  // Paper preset
+  $('preset').addEventListener('change', () => {
+    const p = paperPresets[$('preset').value];
+    if (p) { state.pw = p[0]; state.ph = p[1]; stateToInputs(); render(); }
+  });
+
+  // Classic preset
+  $('classic').addEventListener('change', () => {
+    const key = $('classic').value;
     if (!key) return;
     const p = classicPresets[key];
-    inputs.pw.value = p.pw; inputs.ph.value = p.ph;
-    inputs.mt.value = p.mt; inputs.mb.value = p.mb;
-    inputs.ml.value = p.ml; inputs.mr.value = p.mr;
-    inputs.cols.value = p.cols; inputs.gutter.value = p.gutter;
-    inputs.rows.value = p.rows; inputs.rgutter.value = p.rgutter;
-    inputs.preset.value = 'custom';
-    // update range labels
-    $('cols-val').textContent = p.cols;
-    $('gutter-val').textContent = p.gutter;
-    $('rows-val').textContent = p.rows;
-    $('rgutter-val').textContent = p.rgutter;
+    Object.assign(state, p);
+    $('preset').value = 'custom';
+    stateToInputs();
     render();
   });
 
-  // Sync range labels
-  const rangeLabels = {
-    cols: 'cols-val', gutter: 'gutter-val',
-    rows: 'rows-val', rgutter: 'rgutter-val',
-    showcols: 'showcols-val', showrows: 'showrows-val', showmargins: 'showmargins-val',
-  };
+  // Range labels
+  const rangeIds = ['cols','gutter','rows','rgutter'];
+  rangeIds.forEach(id => {
+    $(id).addEventListener('input', () => {
+      inputsToState();
+      if (id === 'cols') $('cols-val').textContent = state.cols;
+      if (id === 'gutter') $('gutter-val').textContent = mmToDisplay(state.gutter);
+      if (id === 'rows') $('rows-val').textContent = state.rows;
+      if (id === 'rgutter') $('rgutter-val').textContent = mmToDisplay(state.rgutter);
+      render();
+    });
+  });
 
-  Object.entries(rangeLabels).forEach(([id, labelId]) => {
-    const el = $(id);
-    const label = $(labelId);
-    el.addEventListener('input', () => {
-      if (id === 'showcols') label.textContent = el.value == 1 ? 'on' : 'off';
-      else if (id === 'showrows') label.textContent = el.value == 1 ? 'on' : 'off';
-      else if (id === 'showmargins') label.textContent = el.value == 1 ? 'on' : 'off';
-      else label.textContent = el.value;
+  ['showcols','showrows','showmargins'].forEach(id => {
+    $(id).addEventListener('input', () => {
+      inputsToState();
+      $(`${id}-val`).textContent = state[id] ? 'on' : 'off';
       render();
     });
   });
 
   // Number inputs
   ['pw','ph','mt','mb','ml','mr'].forEach(id => {
-    $(id).addEventListener('input', () => { inputs.preset.value = 'custom'; render(); });
+    $(id).addEventListener('input', () => {
+      $('preset').value = 'custom';
+      inputsToState();
+      render();
+    });
   });
 
-  function getValues() {
-    return {
-      pw: +inputs.pw.value, ph: +inputs.ph.value,
-      mt: +inputs.mt.value, mb: +inputs.mb.value,
-      ml: +inputs.ml.value, mr: +inputs.mr.value,
-      cols: +inputs.cols.value, gutter: +inputs.gutter.value,
-      rows: +inputs.rows.value, rgutter: +inputs.rgutter.value,
-      showcols: +inputs.showcols.value,
-      showrows: +inputs.showrows.value,
-      showmargins: +inputs.showmargins.value,
-    };
-  }
-
   function buildSVG(v, scale = 1, forExport = false) {
-    const W = v.pw * MM_TO_PX * scale;
-    const H = v.ph * MM_TO_PX * scale;
-    const s = MM_TO_PX * scale;
-
-    const mt = v.mt * s, mb = v.mb * s, ml = v.ml * s, mr = v.mr * s;
+    const s = MM_TO_PX_96 * scale;
+    const W = v.pw * s, H = v.ph * s;
+    const mt = v.mt*s, mb = v.mb*s, ml = v.ml*s, mr = v.mr*s;
     const contentW = W - ml - mr;
     const contentH = H - mt - mb;
-
-    const colW = (contentW - (v.cols - 1) * v.gutter * s) / v.cols;
-    const rowH = (contentH - (v.rows - 1) * v.rgutter * s) / v.rows;
+    const colW = (contentW - (v.cols-1) * v.gutter * s) / v.cols;
+    const rowH = (contentH - (v.rows-1) * v.rgutter * s) / v.rows;
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
-
-    // White background
     svg += `<rect width="${W}" height="${H}" fill="white"/>`;
 
-    // Margin box
     if (v.showmargins) {
-      svg += `<rect x="${ml}" y="${mt}" width="${contentW}" height="${contentH}" fill="none" stroke="#e8a0a0" stroke-width="${0.5 * scale}" stroke-dasharray="${3*scale},${3*scale}"/>`;
+      svg += `<rect x="${ml}" y="${mt}" width="${contentW}" height="${contentH}" fill="none" stroke="#e8a0a0" stroke-width="${0.5*scale}" stroke-dasharray="${3*scale},${3*scale}"/>`;
     }
-
-    // Columns
     if (v.showcols) {
       for (let i = 0; i < v.cols; i++) {
         const x = ml + i * (colW + v.gutter * s);
-        const colFill = forExport ? "none" : "rgba(100,140,220,0.08)";
-        const colStroke = forExport ? "rgba(100,140,220,0.7)" : "rgba(100,140,220,0.4)";
-        svg += `<rect x="${x}" y="${mt}" width="${colW}" height="${contentH}" fill="${colFill}" stroke="${colStroke}" stroke-width="${0.5 * scale}"/>`;
+        const fill = forExport ? "none" : "rgba(100,140,220,0.08)";
+        const stroke = forExport ? "rgba(100,140,220,0.7)" : "rgba(100,140,220,0.4)";
+        svg += `<rect x="${x}" y="${mt}" width="${colW}" height="${contentH}" fill="${fill}" stroke="${stroke}" stroke-width="${0.5*scale}"/>`;
       }
     }
-
-    // Rows
     if (v.showrows) {
       for (let i = 0; i < v.rows; i++) {
         const y = mt + i * (rowH + v.rgutter * s);
-        const rowFill = forExport ? "none" : "rgba(80,180,120,0.05)";
-        const rowStroke = forExport ? "rgba(80,180,120,0.7)" : "rgba(80,180,120,0.35)";
-        svg += `<rect x="${ml}" y="${y}" width="${contentW}" height="${rowH}" fill="${rowFill}" stroke="${rowStroke}" stroke-width="${0.5 * scale}"/>`;
+        const fill = forExport ? "none" : "rgba(80,180,120,0.05)";
+        const stroke = forExport ? "rgba(80,180,120,0.7)" : "rgba(80,180,120,0.35)";
+        svg += `<rect x="${ml}" y="${y}" width="${contentW}" height="${rowH}" fill="${fill}" stroke="${stroke}" stroke-width="${0.5*scale}"/>`;
       }
     }
-
     svg += `</svg>`;
     return svg;
   }
 
   function render() {
-    const v = getValues();
+    const v = state;
     const main = document.querySelector('main');
-    const maxW = main.clientWidth - 80;
-    const maxH = main.clientHeight - 80;
-    const scaleW = maxW / (v.pw * MM_TO_PX);
-    const scaleH = maxH / (v.ph * MM_TO_PX);
+    const maxW = main.clientWidth - 80, maxH = main.clientHeight - 80;
+    const scaleW = maxW / (v.pw * MM_TO_PX_96);
+    const scaleH = maxH / (v.ph * MM_TO_PX_96);
     const scale = Math.min(scaleW, scaleH, 1);
-
-    const W = v.pw * MM_TO_PX * scale;
-    const H = v.ph * MM_TO_PX * scale;
+    const W = v.pw * MM_TO_PX_96 * scale, H = v.ph * MM_TO_PX_96 * scale;
 
     const svgEl = $('grid-svg');
     svgEl.style.width = W + 'px';
@@ -481,32 +454,30 @@
     svgEl.setAttribute('width', W);
     svgEl.setAttribute('height', H);
 
-    const colW = ((v.pw - v.ml - v.mr) - (v.cols - 1) * v.gutter) / v.cols;
-    $('info-bar').textContent = `${v.pw}×${v.ph}mm · ${v.cols} cols · col width ${colW.toFixed(1)}mm`;
+    const colWmm = ((v.pw - v.ml - v.mr) - (v.cols-1)*v.gutter) / v.cols;
+    const colWDisp = mmToDisplay(colWmm).toFixed(1);
+    $('info-bar').textContent = `${mmToDisplay(v.pw).toFixed(1)}×${mmToDisplay(v.ph).toFixed(1)}${currentUnit} · ${v.cols} cols · col ${colWDisp}${currentUnit}`;
   }
 
-  // Download
   $('btn-download').addEventListener('click', () => {
-    const v = getValues();
+    const v = state;
     const svgStr = buildSVG(v, 1, true);
     const blob = new Blob([svgStr], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `gridit-${v.pw}x${v.ph}-${v.cols}col.svg`;
+    a.download = `gridit-${v.pw.toFixed(0)}x${v.ph.toFixed(0)}mm-${v.cols}col.svg`;
     a.click();
     URL.revokeObjectURL(url);
   });
 
-  // Keyboard
   document.addEventListener('keydown', e => {
     if (e.key === 'o') $('btn-download').click();
   });
 
-  // Init
+  stateToInputs();
   render();
   window.addEventListener('resize', render);
 </script>
-
 </body>
 </html>
