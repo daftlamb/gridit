@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grid It</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #f5f4f0; --fg: #1a1a1a; --accent: #1a1a1a; --muted: #999; --border: #d0cfc9; --header-bg: #fff; }
+    :root { --bg: #f5f5f5; --fg: #1a1a1a; --accent: #1a1a1a; --muted: #888; --border: #d0cfc9; --header-bg: #fafafa; --surface: #fff; --text: #1a1a1a; }
     [data-theme="dark"] {
-      --bg: #141414; --fg: #cccccc; --accent: #39ff14; --muted: #555; --border: #2a2a2a; --header-bg: #0e0e0e;
+      --bg: #141414; --fg: #cccccc; --accent: #39ff14; --muted: #555; --border: #2a2a2a; --header-bg: #0e0e0e; --surface: #1a1a1a; --text: #cccccc;
     }
     [data-theme="dark"] body { background: var(--bg); color: var(--fg); }
     [data-theme="dark"] header { background: var(--header-bg); border-color: var(--border); }
@@ -23,7 +26,7 @@
     [data-theme="dark"] .modal-box { background: #1a1a1a; border-color: #2a2a2a; color: var(--fg); }
     [data-theme="dark"] .preview-area { background: #1a1a1a; }
     body {
-      font-family: 'Courier New', monospace;
+      font-family: "Outfit","Noto Sans SC",sans-serif;
       background: var(--bg); color: var(--fg);
       height: 100vh;
       display: grid;
@@ -34,17 +37,13 @@
     header {
       grid-column: 1 / -1; padding: 14px 24px;
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: baseline; gap: 16px;
+      display: flex; align-items: center; gap: 16px;
     }
-    header h1 { font-size: 14px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-    .header-btn {
-      padding: 3px 8px; border: 1px solid var(--border); background: transparent;
-      font-family: inherit; font-size: 11px; color: var(--muted);
-      cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s;
-    }
-    .header-btn:hover { border-color: var(--accent); color: var(--fg); }
-    .header-btn.lang-active { border-color: var(--accent); color: var(--fg); font-weight: bold; }
+    .brand{font-weight:500;font-size:15px;letter-spacing:-.3px}
+    .brand-it{color:var(--accent)}
+    .sep{flex:1}
+    .btn-icon{height:28px;min-width:28px;border:1px solid var(--border);background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text);transition:border-color .15s,color .15s;padding:0 8px;font-family:inherit}
+    .btn-icon:hover{border-color:var(--accent);color:var(--accent)}
     aside {
       border-right: 1px solid var(--border); padding: 16px 18px;
       overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
@@ -137,17 +136,12 @@
 
 <header>
   <div style="display:flex;align-items:center;gap:10px">
-    <h1>Grid It</h1>
-    <button class="header-btn" id="btn-darkmode" title="Toggle dark mode" style="font-size:12px;padding:0 6px">◐</button>
+    <div class="brand">Grid<span class="brand-it">It</span></div>
+    <button class="btn-icon" id="btn-darkmode" title="Toggle dark mode" style="font-size:12px;padding:0 6px">◐</button>
   </div>
-  <span id="header-sub" style="font-size:11px;color:var(--muted)">v0.2 &mdash; graphic grid generator</span>
-  <div class="header-actions">
-    <button class="header-btn" id="btn-coffee" style="color:#e07820;border-color:#e07820">☕<span class="coffee-text"> buy me a coffee | 支持我</span></button>
-    <button class="header-btn" id="btn-help">?</button>
-    <button class="header-btn" id="btn-about">i</button>
-    <button class="header-btn lang-active" id="btn-lang-en">EN</button>
-    <button class="header-btn" id="btn-lang-zh">&#20013;</button>
-  </div>
+  <div class="sep" style="flex:1"></div>
+  <button class="btn-icon" id="btn-coffee" style="color:#e07820;border-color:#e07820;padding:0 10px;font-size:12px">☕ support</button>
+  <button class="btn-icon" id="btn-about">i</button>
 </header>
 
 <div class="modal-overlay" id="help-modal">
@@ -170,18 +164,17 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="about-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="about-modal-close-btn">&#x2715;</button>
-    <h2 id="about-modal-title">About Grid It</h2>
-    <h3 id="about-modal-h-what">What is Grid It?</h3>
-    <p id="about-modal-p-what">Grid It is a browser-based graphic grid generator for designers. Quickly set up classic typographic grids, export as SVG or PNG, and place them directly into your favourite design tools.</p>
-    <h3 id="about-modal-h-refs">Classic Grid References</h3>
-    <p id="about-modal-p-refs">Inspired by the foundational grid systems of <strong>Josef Müller-Brockmann</strong>, <strong>Jan Tschichold</strong>, and <strong>Van de Graaf</strong> — pioneers of modern typographic layout and the canon of page construction.</p>
-    <h3 id="about-modal-h-author">Author</h3>
-    <p id="about-modal-p-author">Made by <strong>mog</strong> &middot; <a href="mailto:daftlamb@gmail.com" style="color:var(--fg)">daftlamb@gmail.com</a></p>
-    <h3 id="about-modal-h-link">Website</h3>
-    <p id="about-modal-p-link"><a href="https://griditapp.com" target="_blank" style="color:var(--fg)">griditapp.com</a></p>
+<div class="modal-backdrop" id="about-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--surface,#fff);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:380px;width:90%;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.3)">
+    <button id="about-modal-close" style="position:absolute;top:14px;right:14px;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:transparent;color:var(--muted);font-size:14px;cursor:pointer">✕</button>
+    <div style="font-size:36px;margin-bottom:12px">✦</div>
+    <div style="font-size:20px;font-weight:500;margin-bottom:6px">Grid It</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">Generate graphic grids with custom patterns, colors, and layouts. Export as PNG or SVG. Free to use, no signup, no server.</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8">
+      Also try:<br>
+      <a href="https://badgeitapp.com" target="_blank" style="color:var(--accent);text-decoration:none">Badge It</a> — 3D badge generator<br>
+      <a href="https://ditheritapp.com" target="_blank" style="color:var(--accent);text-decoration:none">Dither It</a> — dithering tool
+    </div>
   </div>
 </div>
 
@@ -571,12 +564,12 @@
     if (t['reset']) $('btn-reset').textContent = t['reset'];
     if (t['download-png']) $('btn-download-png').textContent = t['download-png'];
 
-    $('btn-lang-en').classList.toggle('lang-active', lang === 'en');
-    $('btn-lang-zh').classList.toggle('lang-active', lang === 'zh');
+    if ($('btn-lang-en')) $('btn-lang-en').classList.toggle('lang-active', lang === 'en');
+    if ($('btn-lang-zh')) $('btn-lang-zh').classList.toggle('lang-active', lang === 'zh');
   }
 
-  $('btn-lang-en').addEventListener('click', () => applyLang('en'));
-  $('btn-lang-zh').addEventListener('click', () => applyLang('zh'));
+  if ($('btn-lang-en')) $('btn-lang-en').addEventListener('click', () => applyLang('en'));
+  if ($('btn-lang-zh')) $('btn-lang-zh').addEventListener('click', () => applyLang('zh'));
 
   // Unit toggle
   document.querySelectorAll('.unit-btn').forEach(btn => {
@@ -780,16 +773,15 @@
   // Help modal
   function openModal() { $('help-modal').classList.add('open'); }
   function closeModal() { $('help-modal').classList.remove('open'); }
-  $('btn-help').addEventListener('click', openModal);
   $('modal-close-btn').addEventListener('click', closeModal);
   $('help-modal').addEventListener('click', e => { if (e.target === $('help-modal')) closeModal(); });
 
   // About modal
-  function openAbout() { $('about-modal').classList.add('open'); }
-  function closeAbout() { $('about-modal').classList.remove('open'); }
+  function openAbout() { $('about-modal-backdrop').style.display='flex'; }
+  function closeAbout() { $('about-modal-backdrop').style.display='none'; }
   $('btn-about').addEventListener('click', openAbout);
-  $('about-modal-close-btn').addEventListener('click', closeAbout);
-  $('about-modal').addEventListener('click', e => { if (e.target === $('about-modal')) closeAbout(); });
+  document.getElementById('about-modal-close').addEventListener('click', closeAbout);
+  document.getElementById('about-modal-backdrop').addEventListener('click', function(e){ if(e.target===this) closeAbout(); });
 
   // Dark mode toggle
   let darkMode = false;
