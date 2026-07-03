@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grid It</title>
+  <meta name="description" content="Build precise layout grids for Figma, Illustrator, InDesign, and print. Export clean SVG or PNG guides from a focused browser tool.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
@@ -176,7 +177,7 @@
     <button id="about-modal-close" style="position:absolute;top:14px;right:14px;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:transparent;color:var(--muted);font-size:14px;cursor:pointer">✕</button>
     <div style="font-size:36px;margin-bottom:12px">✦</div>
     <div style="font-size:20px;font-weight:500;margin-bottom:6px">Grid It</div>
-    <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">Generate graphic grids with custom patterns, colors, and layouts. Export as PNG or SVG. Free to use, no signup, no server.</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">Build precise layout grids for real artboards. Export clean SVG or PNG guides for Figma, Illustrator, InDesign, and print. Free to use, no signup, no server.</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.8">
       Also try:<br>
       <a href="https://badgeitapp.com" target="_blank" style="color:var(--accent);text-decoration:none">Badge It</a> — 3D badge generator<br>
@@ -320,6 +321,15 @@
     <div class="field" id="ref-opacity-wrap" style="display:none">
       <label>opacity <span id="ref-opacity-val">40</span>%</label>
       <input type="range" id="ref-opacity" min="5" max="95" value="40">
+    </div>
+    <div class="field" id="ref-fit-wrap" style="display:none">
+      <label>fit</label>
+      <div class="unit-toggle">
+        <button class="unit-btn active" data-ref-fit="contain">fit</button>
+        <button class="unit-btn" data-ref-fit="cover">fill</button>
+        <button class="unit-btn" data-ref-fit="original">1:1</button>
+        <button class="unit-btn" id="btn-ref-center" type="button">center</button>
+      </div>
     </div>
     <div class="input-row" id="ref-pos-wrap" style="display:none">
       <div class="num-input">
@@ -688,26 +698,32 @@
     const rowH = (contentH - (v.rows-1) * v.rgutter * s) / v.rows;
 
     let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
-    svg += '<rect width="' + W + '" height="' + H + '" fill="white"/>';
+    svg += '<g id="artboard"><rect width="' + W + '" height="' + H + '" fill="white"/></g>';
 
     if (v.showmargins) {
+      svg += '<g id="margins">';
       svg += '<rect x="' + ml + '" y="' + mt + '" width="' + contentW + '" height="' + contentH + '" fill="none" stroke="' + marginColor + '" stroke-width="' + (0.5*scale) + '" stroke-dasharray="' + (3*scale) + ',' + (3*scale) + '"/>';
+      svg += '</g>';
     }
     if (v.showcols) {
+      svg += '<g id="columns">';
       for (let i = 0; i < v.cols; i++) {
         const x = ml + i * (colW + v.gutter * s);
         const fill = forExport ? 'none' : hexToRgba(colColor, 0.08);
         const stroke = forExport ? colColor : hexToRgba(colColor, 0.5);
-        svg += '<rect x="' + x + '" y="' + mt + '" width="' + colW + '" height="' + contentH + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (0.5*scale) + '"/>';
+        svg += '<rect id="column-' + (i + 1) + '" x="' + x + '" y="' + mt + '" width="' + colW + '" height="' + contentH + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (0.5*scale) + '"/>';
       }
+      svg += '</g>';
     }
     if (v.showrows) {
+      svg += '<g id="rows">';
       for (let i = 0; i < v.rows; i++) {
         const y = mt + i * (rowH + v.rgutter * s);
         const fill = forExport ? 'none' : hexToRgba(rowColor, 0.06);
         const stroke = forExport ? rowColor : hexToRgba(rowColor, 0.45);
-        svg += '<rect x="' + ml + '" y="' + y + '" width="' + contentW + '" height="' + rowH + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (0.5*scale) + '"/>';
+        svg += '<rect id="row-' + (i + 1) + '" x="' + ml + '" y="' + y + '" width="' + contentW + '" height="' + rowH + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (0.5*scale) + '"/>';
       }
+      svg += '</g>';
     }
     svg += '</svg>';
     return svg;
@@ -1028,6 +1044,9 @@
 
   // ── Reference image ──────────────────────────────────────────
   let refImg = null;
+  let refNaturalW = 0;
+  let refNaturalH = 0;
+  let refFit = 'contain';
 
   $('btn-ref-upload').addEventListener('click', () => $('ref-upload').click());
 
@@ -1037,12 +1056,19 @@
     const reader = new FileReader();
     reader.onload = ev => {
       refImg = ev.target.result;
-      updateRefImage();
-      $('btn-ref-clear').style.display = '';
-      $('ref-opacity-wrap').style.display = '';
-      $('ref-pos-wrap').style.display = '';
-      $('ref-scale-wrap').style.display = '';
-      $('btn-ref-upload').style.display = 'none';
+      const probe = new Image();
+      probe.onload = () => {
+        refNaturalW = probe.naturalWidth;
+        refNaturalH = probe.naturalHeight;
+        updateRefImage();
+        $('btn-ref-clear').style.display = '';
+        $('ref-opacity-wrap').style.display = '';
+        $('ref-fit-wrap').style.display = '';
+        $('ref-pos-wrap').style.display = '';
+        $('ref-scale-wrap').style.display = '';
+        $('btn-ref-upload').style.display = 'none';
+      };
+      probe.src = refImg;
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -1050,9 +1076,12 @@
 
   $('btn-ref-clear').addEventListener('click', () => {
     refImg = null;
+    refNaturalW = 0;
+    refNaturalH = 0;
     updateRefImage();
     $('btn-ref-clear').style.display = 'none';
     $('ref-opacity-wrap').style.display = 'none';
+    $('ref-fit-wrap').style.display = 'none';
     $('ref-pos-wrap').style.display = 'none';
     $('ref-scale-wrap').style.display = 'none';
     $('btn-ref-upload').style.display = '';
@@ -1065,6 +1094,24 @@
 
   ['ref-x','ref-y'].forEach(id => {
     $(id).addEventListener('input', updateRefImage);
+  });
+
+  document.querySelectorAll('[data-ref-fit]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      refFit = btn.dataset.refFit;
+      document.querySelectorAll('[data-ref-fit]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateRefImage();
+    });
+  });
+
+  $('btn-ref-center').addEventListener('click', () => {
+    const wrap = $('preview-wrap');
+    const x = refFit === 'original' ? Math.round((wrap.offsetWidth - refNaturalW) / 2) : 0;
+    const y = refFit === 'original' ? Math.round((wrap.offsetHeight - refNaturalH) / 2) : 0;
+    $('ref-x').value = x;
+    $('ref-y').value = y;
+    updateRefImage();
   });
 
   $('ref-scale').addEventListener('input', () => {
@@ -1089,10 +1136,10 @@
     const sc = +($('ref-scale') ? $('ref-scale').value : 100) / 100;
     existing.src = refImg;
     existing.style.opacity = $('ref-opacity').value / 100;
-    existing.style.width = '100%';
-    existing.style.height = '100%';
-    existing.style.objectFit = 'contain';
-    existing.style.objectPosition = 'top left';
+    existing.style.width = refFit === 'original' ? refNaturalW + 'px' : '100%';
+    existing.style.height = refFit === 'original' ? refNaturalH + 'px' : '100%';
+    existing.style.objectFit = refFit === 'original' ? 'contain' : refFit;
+    existing.style.objectPosition = refFit === 'cover' ? 'center center' : 'top left';
     existing.style.transform = `translate(${x}px, ${y}px) scale(${sc})`;
   }
 
