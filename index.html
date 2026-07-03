@@ -93,7 +93,7 @@
     }
     .preset-social-btn:hover { border-color: var(--accent); color: var(--fg); }
     main { display: flex; align-items: center; justify-content: center; background: #e8e7e3; overflow: hidden; position: relative; }
-    #preview-wrap { position: relative; background: white; box-shadow: 0 4px 32px rgba(0,0,0,0.12); }
+    #preview-wrap { position: relative; overflow: hidden; background: white; box-shadow: 0 4px 32px rgba(0,0,0,0.12); }
     #grid-svg { display: block; position: relative; z-index: 1; }
     .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .toggle-row label { font-size: 11px; color: var(--muted); }
@@ -330,6 +330,10 @@
         <button class="unit-btn" data-ref-fit="original">1:1</button>
         <button class="unit-btn" id="btn-ref-center" type="button">center</button>
       </div>
+    </div>
+    <div class="toggle-row" id="ref-clip-wrap" style="display:none">
+      <label>clip to margins</label>
+      <label class="toggle"><input type="checkbox" id="ref-clip-margins"><span class="toggle-slider"></span></label>
     </div>
     <div class="input-row" id="ref-pos-wrap" style="display:none">
       <div class="num-input">
@@ -1065,6 +1069,7 @@
         $('btn-ref-clear').style.display = '';
         $('ref-opacity-wrap').style.display = '';
         $('ref-fit-wrap').style.display = '';
+        $('ref-clip-wrap').style.display = '';
         $('ref-pos-wrap').style.display = '';
         $('ref-scale-wrap').style.display = '';
         $('btn-ref-upload').style.display = 'none';
@@ -1083,6 +1088,7 @@
     $('btn-ref-clear').style.display = 'none';
     $('ref-opacity-wrap').style.display = 'none';
     $('ref-fit-wrap').style.display = 'none';
+    $('ref-clip-wrap').style.display = 'none';
     $('ref-pos-wrap').style.display = 'none';
     $('ref-scale-wrap').style.display = 'none';
     $('btn-ref-upload').style.display = '';
@@ -1096,6 +1102,8 @@
   ['ref-x','ref-y'].forEach(id => {
     $(id).addEventListener('input', updateRefImage);
   });
+
+  $('ref-clip-margins').addEventListener('change', updateRefImage);
 
   document.querySelectorAll('[data-ref-fit]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1121,26 +1129,44 @@
   });
 
   function updateRefImage() {
+    let clip = document.getElementById('ref-clip-el');
     let existing = document.getElementById('ref-img-el');
     if (!refImg) {
-      if (existing) existing.remove();
+      if (clip) clip.remove();
       return;
     }
-    if (!existing) {
+    if (!clip) {
+      clip = document.createElement('div');
+      clip.id = 'ref-clip-el';
+      clip.style.cssText = 'position:absolute;pointer-events:none;z-index:0;overflow:hidden';
       existing = document.createElement('img');
       existing.id = 'ref-img-el';
-      existing.style.cssText = 'position:absolute;pointer-events:none;z-index:0;transform-origin:top left';
-      $('preview-wrap').insertBefore(existing, $('grid-svg'));
+      existing.style.cssText = 'position:absolute;pointer-events:none;transform-origin:top left';
+      clip.appendChild(existing);
+      $('preview-wrap').insertBefore(clip, $('grid-svg'));
     }
     const x = +($('ref-x') ? $('ref-x').value : 0);
     const y = +($('ref-y') ? $('ref-y').value : 0);
     const sc = +($('ref-scale') ? $('ref-scale').value : 100) / 100;
+    const wrap = $('preview-wrap');
+    const previewScale = wrap.offsetWidth / (state.pw * MM_TO_PX_96);
+    const useMarginClip = $('ref-clip-margins').checked;
+    const clipX = useMarginClip ? state.ml * MM_TO_PX_96 * previewScale : 0;
+    const clipY = useMarginClip ? state.mt * MM_TO_PX_96 * previewScale : 0;
+    const clipW = useMarginClip ? (state.pw - state.ml - state.mr) * MM_TO_PX_96 * previewScale : wrap.offsetWidth;
+    const clipH = useMarginClip ? (state.ph - state.mt - state.mb) * MM_TO_PX_96 * previewScale : wrap.offsetHeight;
+    clip.style.left = clipX + 'px';
+    clip.style.top = clipY + 'px';
+    clip.style.width = Math.max(0, clipW) + 'px';
+    clip.style.height = Math.max(0, clipH) + 'px';
     existing.src = refImg;
     existing.style.opacity = $('ref-opacity').value / 100;
-    existing.style.width = refFit === 'original' ? refNaturalW + 'px' : '100%';
-    existing.style.height = refFit === 'original' ? refNaturalH + 'px' : '100%';
+    existing.style.width = refFit === 'original' ? refNaturalW + 'px' : wrap.offsetWidth + 'px';
+    existing.style.height = refFit === 'original' ? refNaturalH + 'px' : wrap.offsetHeight + 'px';
     existing.style.objectFit = refFit === 'original' ? 'contain' : refFit;
     existing.style.objectPosition = refFit === 'cover' ? 'center center' : 'top left';
+    existing.style.left = -clipX + 'px';
+    existing.style.top = -clipY + 'px';
     existing.style.transform = `translate(${x}px, ${y}px) scale(${sc})`;
   }
 
