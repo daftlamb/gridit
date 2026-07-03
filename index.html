@@ -1091,7 +1091,8 @@
     existing.style.opacity = $('ref-opacity').value / 100;
     existing.style.width = '100%';
     existing.style.height = '100%';
-    existing.style.objectFit = 'fill';
+    existing.style.objectFit = 'contain';
+    existing.style.objectPosition = 'top left';
     existing.style.transform = `translate(${x}px, ${y}px) scale(${sc})`;
   }
 
